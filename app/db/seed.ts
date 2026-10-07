@@ -65,16 +65,8 @@ export async function seedDatabase() {
   const clientMap = new Map(existingClients.map((c) => [c.email, c.id]));
 
   // 3. Usuarios (uno por rol: Administrador, Vendedor, Cliente)
-  console.log("Insertando usuarios con Bun.password.hash...");
-  const hashPw = async (password: string) => {
-    if (typeof Bun !== "undefined" && Bun.password) {
-      return Bun.password.hash(password, { algorithm: "argon2id" });
-    }
-    const crypto = await import("node:crypto");
-    const salt = crypto.randomBytes(16).toString("hex");
-    const hash = crypto.scryptSync(password, salt, 64).toString("hex");
-    return `${salt}:${hash}`;
-  };
+  console.log("Insertando usuarios con contraseñas hasheadas...");
+  const { hashPassword: hashPw } = await import("../services/auth.server.ts");
 
   const adminPassHash = await hashPw("admin123");
   const vendorPassHash = await hashPw("vendedor123");

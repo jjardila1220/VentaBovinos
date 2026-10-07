@@ -13,7 +13,8 @@ import {
   Users, 
   BarChart3, 
   PlusCircle, 
-  Package
+  Package,
+  Layers
 } from "lucide-react";
 
 interface HeaderProps {
@@ -41,6 +42,67 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
     { to: "/catalogo", label: "Catálogo" },
     { to: "/nosotros", label: "Nosotros" },
     { to: "/contacto", label: "Contacto" },
+  ];
+
+  const isAdminSection =
+    location.pathname.startsWith("/inventario") ||
+    location.pathname.startsWith("/ventas") ||
+    location.pathname.startsWith("/reportes") ||
+    location.pathname.startsWith("/usuarios") ||
+    location.pathname.startsWith("/bovinos") ||
+    location.pathname.startsWith("/facturas");
+
+  const adminMenuItems = [
+    ...(isAdmin
+      ? [
+          {
+            to: "/bovinos/nuevo",
+            label: "Registrar bovino",
+            hint: "Alta con datos básicos y atributos",
+            icon: PlusCircle,
+            iconClass: "text-emerald-600",
+          },
+          {
+            to: "/catalogo",
+            label: "Consultar y filtrar",
+            hint: "Búsqueda por raza, peso y características",
+            icon: Layers,
+            iconClass: "text-stone-500",
+          },
+        ]
+      : []),
+    {
+      to: "/inventario",
+      label: "Inventario y movimientos",
+      hint: "Consultar, modificar y trazabilidad",
+      icon: Package,
+      iconClass: "text-amber-600",
+    },
+    {
+      to: "/ventas",
+      label: "Historial de ventas",
+      hint: "Facturas con índice único",
+      icon: FileText,
+      iconClass: "text-blue-600",
+    },
+    ...(isAdmin
+      ? [
+          {
+            to: "/reportes",
+            label: "Reportes consolidados",
+            hint: "Ventas, inventario y movimientos",
+            icon: BarChart3,
+            iconClass: "text-purple-600",
+          },
+          {
+            to: "/usuarios",
+            label: "Gestión de usuarios",
+            hint: "Roles y autenticación administrativa",
+            icon: Users,
+            iconClass: "text-rose-600",
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -110,7 +172,9 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
               <button
                 type="button"
                 onClick={() => setAdminMenuOpen(!adminMenuOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-amber-200 hover:bg-[#8B1820] font-semibold"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-amber-200 hover:bg-[#8B1820] font-semibold ${
+                  isAdminSection ? "bg-[#8B1820] text-white" : ""
+                }`}
               >
                 <ShieldCheck className="w-4 h-4 text-amber-300" />
                 <span>Administración</span>
@@ -119,73 +183,35 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
 
               {adminMenuOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-56 bg-white text-stone-800 rounded-2xl shadow-2xl border border-stone-200 py-2 z-50"
+                  className="absolute right-0 mt-2 w-72 bg-white text-stone-800 rounded-2xl shadow-2xl border border-stone-200 py-2 z-50"
                   onMouseLeave={() => setAdminMenuOpen(false)}
                 >
                   <div className="px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100">
                     Panel {user?.role}
                   </div>
 
-                  {isAdmin && (
+                  {adminMenuItems.map((item) => (
                     <Link
-                      to="/admin/bovinos/nuevo"
+                      key={item.to}
+                      to={item.to}
                       onClick={() => setAdminMenuOpen(false)}
-                      className="block px-3.5 py-2 hover:bg-stone-50 text-xs font-semibold text-stone-700 hover:text-[#B3202A]"
+                      className={`block px-3.5 py-2 hover:bg-stone-50 ${
+                        location.pathname === item.to ? "bg-rose-50" : ""
+                      }`}
                     >
-                      <span className="flex items-center gap-2">
-                        <PlusCircle className="w-4 h-4 text-emerald-600" />
-                        Registrar Nuevo Bovino
+                      <span className="flex items-start gap-2">
+                        <item.icon className={`w-4 h-4 mt-0.5 shrink-0 ${item.iconClass}`} />
+                        <span>
+                          <span className="block text-xs font-semibold text-stone-700 hover:text-[#B3202A]">
+                            {item.label}
+                          </span>
+                          <span className="block text-[10px] text-stone-400 font-medium leading-tight">
+                            {item.hint}
+                          </span>
+                        </span>
                       </span>
                     </Link>
-                  )}
-
-                  <Link
-                    to="/admin/inventario"
-                    onClick={() => setAdminMenuOpen(false)}
-                    className="block px-3.5 py-2 hover:bg-stone-50 text-xs font-semibold text-stone-700 hover:text-[#B3202A]"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Package className="w-4 h-4 text-amber-600" />
-                      Inventario & Movimientos
-                    </span>
-                  </Link>
-
-                  <Link
-                    to="/admin/ventas"
-                    onClick={() => setAdminMenuOpen(false)}
-                    className="block px-3.5 py-2 hover:bg-stone-50 text-xs font-semibold text-stone-700 hover:text-[#B3202A]"
-                  >
-                    <span className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-blue-600" />
-                      Historial de Ventas
-                    </span>
-                  </Link>
-
-                  {isAdmin && (
-                    <>
-                      <Link
-                        to="/admin/reportes"
-                        onClick={() => setAdminMenuOpen(false)}
-                        className="block px-3.5 py-2 hover:bg-stone-50 text-xs font-semibold text-stone-700 hover:text-[#B3202A]"
-                      >
-                        <span className="flex items-center gap-2">
-                          <BarChart3 className="w-4 h-4 text-purple-600" />
-                          Reportes Consolidados
-                        </span>
-                      </Link>
-
-                      <Link
-                        to="/admin/usuarios"
-                        onClick={() => setAdminMenuOpen(false)}
-                        className="block px-3.5 py-2 hover:bg-stone-50 text-xs font-semibold text-stone-700 hover:text-[#B3202A]"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-rose-600" />
-                          Gestión de Usuarios
-                        </span>
-                      </Link>
-                    </>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
@@ -257,13 +283,33 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                     </div>
 
                     <div className="py-1">
-                      <Link
-                        to="/admin/ventas"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="block px-4 py-2 hover:bg-stone-50 text-xs font-medium text-stone-700"
-                      >
-                        Mis Facturas y Compras
-                      </Link>
+                      {isStaff ? (
+                        <Link
+                          to="/ventas"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 hover:bg-stone-50 text-xs font-medium text-stone-700"
+                        >
+                          Historial de ventas y facturas
+                        </Link>
+                      ) : (
+                        <Link
+                          to="/carrito"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 hover:bg-stone-50 text-xs font-medium text-stone-700"
+                        >
+                          <ShoppingBag className="w-4 h-4 text-stone-400" />
+                          Mi carrito de compras
+                        </Link>
+                      )}
+                      {isAdmin && (
+                        <Link
+                          to="/inventario"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 hover:bg-stone-50 text-xs font-medium text-stone-700"
+                        >
+                          Panel de inventario
+                        </Link>
+                      )}
                     </div>
 
                     <div className="pt-2 border-t border-stone-100 px-3">
@@ -335,47 +381,16 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                 <div className="pt-2 text-[10px] uppercase font-bold text-amber-300 px-3">
                   Administración ({user?.role})
                 </div>
-                {isAdmin && (
+                {adminMenuItems.map((item) => (
                   <Link
-                    to="/admin/bovinos/nuevo"
+                    key={item.to}
+                    to={item.to}
                     onClick={() => setMobileMenuOpen(false)}
                     className="px-3 py-2 rounded-lg text-amber-100"
                   >
-                    + Registrar Bovino
+                    {item.label}
                   </Link>
-                )}
-                <Link
-                  to="/admin/inventario"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg text-amber-100"
-                >
-                  Inventario & Movimientos
-                </Link>
-                <Link
-                  to="/admin/ventas"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg text-amber-100"
-                >
-                  Historial de Ventas
-                </Link>
-                {isAdmin && (
-                  <>
-                    <Link
-                      to="/admin/reportes"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="px-3 py-2 rounded-lg text-amber-100"
-                    >
-                      Reportes Consolidados
-                    </Link>
-                    <Link
-                      to="/admin/usuarios"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="px-3 py-2 rounded-lg text-amber-100"
-                    >
-                      Gestión de Usuarios
-                    </Link>
-                  </>
-                )}
+                ))}
               </>
             )}
           </div>

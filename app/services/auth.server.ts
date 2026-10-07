@@ -7,11 +7,7 @@ import { getUser, getSession, commitSession } from "./session.server.ts";
 declare const Bun: any;
 
 export async function hashPassword(password: string): Promise<string> {
-  // En runtime Bun usamos Bun.password.hash
-  if (typeof Bun !== "undefined" && Bun.password) {
-    return Bun.password.hash(password, { algorithm: "argon2id" });
-  }
-  // Fallback si corre fuera de bun
+  // scrypt: compatible con Vite SSR (Node) y con Bun
   const crypto = await import("node:crypto");
   const salt = crypto.randomBytes(16).toString("hex");
   const hash = crypto.scryptSync(password, salt, 64).toString("hex");
@@ -19,16 +15,18 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  if (typeof Bun !== "undefined" && Bun.password) {
+  if (hash.startsWith("$argon2") && typeof Bun !== "undefined" && Bun.password) {
     try {
       return await Bun.password.verify(password, hash);
     } catch {
       return false;
     }
   }
+
   try {
     const crypto = await import("node:crypto");
     const [salt, key] = hash.split(":");
+    if (!salt || !key) return false;
     const testHash = crypto.scryptSync(password, salt, 64).toString("hex");
     return key === testHash;
   } catch {
