@@ -1,27 +1,26 @@
 {
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "compilerOptions": {
-    "target": "ES2022",
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false,
-    "module": "ESNext",
-    "types": ["vite/client"],
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["@remix-run/node", "vite/client"],
     "isolatedModules": true,
-    "moduleDetection": "force",
-    "allowJs": true,
+    "esModuleInterop": true,
     "jsx": "react-jsx",
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "target": "ES2022",
+    "strict": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "allowImportingTsExtensions": true,
+    "paths": {
+      "~/*": ["./app/*"]
+    },
     "noEmit": true
   }
 }

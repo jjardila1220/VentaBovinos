@@ -110,17 +110,53 @@ Puede iniciar sesión normalmente desde la pantalla de **Inicio de sesión** o h
 
 ---
 
-## 💻 Instrucciones para Ejecutar
+## 💻 Instrucciones para Ejecutar en WSL / Local
 
-```bash
-# Instalar dependencias
-npm install
+### 1. Requisitos Previos
+- **Bun** (v1.1+ instalado en WSL/Linux: `curl -fsSL https://bun.sh/install | bash`).
+- **PostgreSQL** corriendo en `localhost:5432` con una base de datos llamada `carnes` y usuario `postgres`:
+  ```bash
+  # En WSL / Ubuntu:
+  sudo service postgresql start
+  sudo -u postgres psql -c "CREATE DATABASE carnes;"
+  ```
 
-# Iniciar servidor de desarrollo en puerto 3000
-npm run dev
-
-# Compilar para producción
-npm run build
+### 2. Configurar Variables de Entorno
+Crea un archivo `.env` en la raíz del proyecto (basado en `.env.example`):
+```env
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=carnes
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+SESSION_SECRET=un_secreto_muy_seguro_para_firmar_cookies_de_remix_2026
 ```
 
-Abra el navegador en `http://localhost:3000` para interactuar con la plataforma.
+### 3. Instalación de Dependencias
+```bash
+bun install
+```
+
+### 4. Migraciones y Carga de Datos (Seed)
+Aplica las migraciones SQL generadas por Drizzle Kit y siembra los datos de prueba (razas, clientes, 13 bovinos, cortes cárnicos, facturas y usuarios):
+```bash
+# Aplicar migraciones SQL a la base 'carnes'
+bun run migrate
+
+# Sembrar los datos de prueba iniciales
+bun run seed
+```
+
+### 5. Iniciar Servidor de Desarrollo
+```bash
+bun run dev
+```
+Abre tu navegador en `http://localhost:5173`.
+
+### 6. Otros Scripts Disponibles
+- `bun run build`: Compila la aplicación con Remix y Vite.
+- `bun run start`: Inicia el servidor de producción con `remix-serve` en el puerto 3000.
+- `bun run generate`: Genera nuevas migraciones SQL en `./drizzle` a partir del esquema Drizzle ORM.
+- `bun run push`: Aplica cambios directamente del esquema a la base sin crear archivo de migración.
+- `bun run studio`: Abre la interfaz gráfica web de Drizzle Studio para explorar las tablas.
+- `bun test`: Ejecuta la suite de pruebas unitarias con Bun test.
