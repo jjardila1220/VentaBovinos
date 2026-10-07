@@ -1,0 +1,6 @@
+{
+  "name": "GanadoCarnes - Compra y Venta de Ganado",
+  "description": "Plataforma de compra y venta de ganado lechero y carnal. Catálogo con filtros avanzados, carrito, checkout con factura única, inventario, reportes y gestión de usuarios.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
