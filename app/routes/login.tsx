@@ -2,7 +2,7 @@ import { json, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-r
 import { useActionData, useSearchParams, Form, Link, useNavigation } from "@remix-run/react";
 import { authenticate, createUserSession } from "~/services/auth.server.ts";
 import { getUser } from "~/services/session.server.ts";
-import { Lock, Mail, User, Shield, Sparkles, AlertCircle } from "lucide-react";
+import { Lock, Mail, AlertCircle } from "lucide-react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getUser(request);
@@ -113,57 +113,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Botones de Acceso Rápido para Pruebas y Evaluación */}
-      <div className="bg-[#F9E3E3] p-5 rounded-3xl border border-rose-200/80 space-y-3 text-xs">
-        <div className="flex items-center gap-1.5 font-black text-[#8B1820]">
-          <Sparkles className="w-4 h-4" />
-          <span>Acceso Rápido para Pruebas (1 Clic)</span>
-        </div>
-        <p className="text-[11px] text-stone-600">
-          Haz clic en cualquiera de los roles para probar los permisos de la aplicación al instante:
-        </p>
-
-        <div className="grid grid-cols-1 gap-2 pt-1">
-          <Form method="post">
-            <input type="hidden" name="email" value="admin@ganadocarnes.com" />
-            <input type="hidden" name="password" value="admin123" />
-            <input type="hidden" name="redirectTo" value={redirectTo} />
-            <button
-              type="submit"
-              className="w-full p-2.5 bg-white hover:bg-stone-50 text-stone-800 rounded-xl border border-rose-200 font-bold text-[11px] flex items-center justify-between transition-colors shadow-2xs"
-            >
-              <span>👑 Administrador (Acceso Total)</span>
-              <span className="text-[10px] text-stone-400">admin@ganadocarnes.com</span>
-            </button>
-          </Form>
-
-          <Form method="post">
-            <input type="hidden" name="email" value="vendedor@ganadocarnes.com" />
-            <input type="hidden" name="password" value="vendedor123" />
-            <input type="hidden" name="redirectTo" value={redirectTo} />
-            <button
-              type="submit"
-              className="w-full p-2.5 bg-white hover:bg-stone-50 text-stone-800 rounded-xl border border-rose-200 font-bold text-[11px] flex items-center justify-between transition-colors shadow-2xs"
-            >
-              <span>💼 Vendedor (Operaciones)</span>
-              <span className="text-[10px] text-stone-400">vendedor@ganadocarnes.com</span>
-            </button>
-          </Form>
-
-          <Form method="post">
-            <input type="hidden" name="email" value="cliente@ganadocarnes.com" />
-            <input type="hidden" name="password" value="cliente123" />
-            <input type="hidden" name="redirectTo" value={redirectTo} />
-            <button
-              type="submit"
-              className="w-full p-2.5 bg-white hover:bg-stone-50 text-stone-800 rounded-xl border border-rose-200 font-bold text-[11px] flex items-center justify-between transition-colors shadow-2xs"
-            >
-              <span>🛍️ Cliente (Comprador)</span>
-              <span className="text-[10px] text-stone-400">cliente@ganadocarnes.com</span>
-            </button>
-          </Form>
-        </div>
-      </div>
     </div>
   );
 }

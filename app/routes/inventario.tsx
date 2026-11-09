@@ -1,9 +1,9 @@
-import { json, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-run/node";
+import { json, redirect, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useActionData, Form, Link, useSearchParams, useNavigation } from "@remix-run/react";
 import { useState } from "react";
 import { requireStaff, requireAdmin } from "~/services/auth.server.ts";
 import { getInventoryStock, getMovementsLog } from "~/services/inventory.server.ts";
-import { getAllBreeds, updateBovine } from "~/services/bovines.server.ts";
+import { deleteBovine, getAllBreeds, updateBovine } from "~/services/bovines.server.ts";
 import { formatCOP, formatDateTime } from "~/utils/formatters.ts";
 import { 
   Package, 
@@ -88,11 +88,29 @@ export async function action({ request }: ActionFunctionArgs) {
     }
   }
 
-  return json({ ok: true });
+  if (intent === "delete") {
+    const bovineId = Number(formData.get("bovineId"));
+    if (!Number.isInteger(bovineId) || bovineId <= 0) {
+      return json({ error: "El bovino seleccionado no es válido." }, { status: 400 });
+    }
+
+    try {
+      await deleteBovine(bovineId, user.id);
+      return redirect("/inventario?success=Bovino+eliminado+correctamente");
+    } catch (error) {
+      return json(
+        { error: error instanceof Error ? error.message : "No se pudo eliminar el bovino." },
+        { status: 400 }
+      );
+    }
+  }
+
+  return json({ error: "Acción no válida." }, { status: 400 });
 }
 
 export default function Inventario() {
-  const { items, stats, movements, breeds, isAdmin, currentTab, filters } = useLoaderData<typeof loader>();
+  const { items, stats, movements, isAdmin, currentTab, filters } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [activeTab, setActiveTab] = useState<"stock" | "movimientos">(currentTab === "movimientos" ? "movimientos" : "stock");
   const navigation = useNavigation();
 
@@ -197,6 +215,12 @@ export default function Inventario() {
         {/* CONTENIDO TAB 1: STOCK */}
         {activeTab === "stock" && (
           <div className="p-6 space-y-6">
+            {actionData && "error" in actionData && actionData.error && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-800">
+                {actionData.error}
+              </div>
+            )}
+
             {/* Filtros de la tabla */}
             <Form method="get" className="flex flex-wrap items-center gap-3 text-xs">
               <input type="hidden" name="tab" value="stock" />
@@ -280,13 +304,33 @@ export default function Inventario() {
                             <Eye className="w-4 h-4" />
                           </Link>
                           {isAdmin && (
-                            <Link
-                              to={`/bovinos/${b.id}/editar`}
-                              className="p-1.5 text-stone-400 hover:text-stone-800 hover:bg-stone-100 rounded-lg transition-colors"
-                              title="Editar Ejemplar"
-                            >
-                              <Edit3 className="w-4 h-4" />
-                            </Link>
+                            <>
+                              <Link
+                                to={`/bovinos/${b.id}/editar`}
+                                className="p-1.5 text-stone-400 hover:text-stone-800 hover:bg-stone-100 rounded-lg transition-colors"
+                                title="Editar Ejemplar"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </Link>
+                              <Form
+                                method="post"
+                                onSubmit={(event) => {
+                                  if (!window.confirm(`¿Eliminar "${b.name}" del inventario?`)) {
+                                    event.preventDefault();
+                                  }
+                                }}
+                              >
+                                <input type="hidden" name="intent" value="delete" />
+                                <input type="hidden" name="bovineId" value={b.id} />
+                                <button
+                                  type="submit"
+                                  className="p-1.5 text-stone-400 hover:text-[#B3202A] hover:bg-rose-50 rounded-lg transition-colors"
+                                  title="Eliminar Ejemplar"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              </Form>
+                            </>
                           )}
                         </div>
                       </td>

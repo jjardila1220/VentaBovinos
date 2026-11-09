@@ -6,20 +6,20 @@ Plataforma web responsive para la comercialización de bovinos (ganado lechero y
 
 ## 🚀 Tecnologías Utilizadas (Stack)
 
-- **Frontend:** React 19 + TypeScript + Vite.
+- **Frontend:** React 19 + TypeScript + Remix + Vite.
 - **Estilos:** Tailwind CSS 4 con paleta personalizada:
   - Rojo principal: `#B3202A`
   - Rojo oscuro para encabezados y hover: `#8B1820`
   - Fondo rosa claro en secciones destacadas: `#F9E3E3`
   - Tarjetas en fondo blanco con bordes redondeados y sombras suaves.
 - **Iconografía:** Lucide React (íconos zootécnicos y comerciales).
-- **Capa de Servicios y Persistencia:** Servicios desacoplados (`bovineService`, `salesService`, `authService`, `storageService`) con persistencia en memoria y `localStorage` para facilitar la conexión futura a una API REST / GraphQL.
+- **Capa de Servicios y Persistencia:** Servicios server-side con Drizzle ORM y PostgreSQL. Los bovinos, usuarios, ventas y movimientos se almacenan en la base de datos; no se utiliza `localStorage` ni mock data en el runtime.
 
 ---
 
 ## 👥 Usuarios de Prueba y Credenciales
 
-Puede iniciar sesión normalmente desde la pantalla de **Inicio de sesión** o hacer clic en el **conmutador rápido de la barra superior** para probar cualquier rol en 1 clic:
+Puede iniciar sesión normalmente desde la pantalla de **Inicio de sesión**. Las cuentas iniciales se crean mediante el seed de PostgreSQL:
 
 | Rol | Correo Electrónico | Contraseña | Permisos y Alcance |
 | :--- | :--- | :--- | :--- |
@@ -75,7 +75,7 @@ Puede iniciar sesión normalmente desde la pantalla de **Inicio de sesión** o h
 8. **Inicio de Sesión y Registro:**
    - Formulario de login (correo y contraseña oculta) y de registro de usuario.
    - Mensajes de error genéricos (*"Credenciales inválidas"*).
-   - Botones de acceso rápido para pruebas de evaluación.
+   - Autenticación mediante sesión server-side y control de acceso por rol.
 
 9. **Historial de Ventas (Administrador y Vendedor):**
    - Filtros por rango de fechas, estado (*Completado*, *En proceso*, *Cancelado*), producto y número de factura.
