@@ -7,7 +7,20 @@ import { clients } from "~/db/schema/clients.ts";
 import { users } from "~/db/schema/users.ts";
 import { eq, gte, lte, and, desc } from "drizzle-orm";
 
-export async function getConsolidatedReport(type: "Ventas" | "Inventario" | "Movimientos", startDate?: string, endDate?: string) {
+export async function getReportClients() {
+  return db
+    .select({ id: clients.id, name: clients.name, document: clients.document })
+    .from(clients)
+    .orderBy(clients.name);
+}
+
+export async function getConsolidatedReport(
+  type: "Ventas" | "Inventario" | "Movimientos",
+  startDate?: string,
+  endDate?: string,
+  clientId?: number,
+  status?: string
+) {
   const conditions = [];
   if (startDate) conditions.push(gte(sales.date, new Date(startDate)));
   if (endDate) {
@@ -15,6 +28,8 @@ export async function getConsolidatedReport(type: "Ventas" | "Inventario" | "Mov
     end.setHours(23, 59, 59, 999);
     conditions.push(lte(sales.date, end));
   }
+  if (clientId) conditions.push(eq(sales.clientId, clientId));
+  if (status && status !== "Todos") conditions.push(eq(sales.status, status as any));
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
   if (type === "Ventas") {

@@ -1,8 +1,7 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Form, Link } from "@remix-run/react";
-import { useState } from "react";
 import { requireAdmin } from "~/services/auth.server.ts";
-import { getConsolidatedReport } from "~/services/reports.server.ts";
+import { getConsolidatedReport, getReportClients } from "~/services/reports.server.ts";
 import { formatCOP, formatDate } from "~/utils/formatters.ts";
 import { 
   BarChart3, 
@@ -24,12 +23,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const type = (url.searchParams.get("type") as any) || "Ventas";
   const startDate = url.searchParams.get("startDate") || "";
   const endDate = url.searchParams.get("endDate") || "";
+  const clientIdParam = url.searchParams.get("clientId") || "";
+  const clientId = clientIdParam ? Number(clientIdParam) : undefined;
+  const status = url.searchParams.get("status") || "Todos";
 
   try {
-    const reportData = await getConsolidatedReport(type, startDate || undefined, endDate || undefined);
+    const [reportData, clients] = await Promise.all([
+      getConsolidatedReport(type, startDate || undefined, endDate || undefined, clientId, status),
+      getReportClients(),
+    ]);
     return json({
       report: reportData,
-      filters: { type, startDate, endDate },
+      clients,
+      filters: { type, startDate, endDate, clientId: clientIdParam, status },
     });
   } catch (error) {
     console.error("Reports loader error:", error);
@@ -43,13 +49,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
         categoryStats: {},
         salesList: [],
       },
-      filters: { type, startDate, endDate },
+      clients: [],
+      filters: { type, startDate, endDate, clientId: clientIdParam, status },
     });
   }
 }
 
 export default function Reportes() {
-  const { report, filters } = useLoaderData<typeof loader>();
+  const { report, filters, clients } = useLoaderData<typeof loader>();
 
   const downloadCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
@@ -105,7 +112,7 @@ export default function Reportes() {
             <span>Reportes Consolidados</span>
           </h1>
           <p className="text-stone-500 text-xs mt-1">
-            Analítica de facturación, rotación de hato y balance de existencias con exportación a CSV.
+            Analítica de facturación, rotación de hato y balance de existencias con exportación a CSV y PDF.
           </p>
         </div>
 
@@ -117,11 +124,26 @@ export default function Reportes() {
           <Download className="w-4 h-4" />
           <span>Exportar a CSV</span>
         </button>
+        {isVentas && (
+          <a
+            href={`/reportes/pdf?${new URLSearchParams({
+              type: filters.type,
+              startDate: filters.startDate,
+              endDate: filters.endDate,
+              clientId: filters.clientId,
+              status: filters.status,
+            }).toString()}`}
+            className="px-5 py-2.5 bg-[#B3202A] hover:bg-[#8B1820] text-white rounded-xl text-xs font-bold shadow-md transition-colors flex items-center gap-2 self-start sm:self-auto"
+          >
+            <Download className="w-4 h-4" />
+            <span>Descargar PDF</span>
+          </a>
+        )}
       </div>
 
       {/* Selector de Tipo y Rango de Fechas */}
       <div className="bg-white p-5 rounded-3xl shadow-sm border border-stone-200">
-        <Form method="get" className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs items-end">
+        <Form method="get" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs items-end">
           <div className="space-y-1 sm:col-span-1">
             <label className="font-bold text-stone-700 block">Tipo de Reporte</label>
             <select
@@ -132,6 +154,24 @@ export default function Reportes() {
               <option value="Ventas">Ventas por Período</option>
               <option value="Inventario">Inventario Actual</option>
               <option value="Movimientos">Movimientos de Ganado</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="font-bold text-stone-700 block">Cliente</label>
+            <select
+              name="clientId"
+              defaultValue={filters.clientId}
+              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
+            >
+              <option value="">Todos los clientes</option>
+              {clients.map((client) =>
+                client ? (
+                  <option key={client.id} value={client.id}>
+                    {client.name} - {client.document}
+                  </option>
+                ) : null
+              )}
             </select>
           </div>
 
@@ -153,6 +193,20 @@ export default function Reportes() {
               defaultValue={filters.endDate}
               className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
             />
+          </div>
+
+          <div className="space-y-1">
+            <label className="font-bold text-stone-700 block">Estado</label>
+            <select
+              name="status"
+              defaultValue={filters.status}
+              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
+            >
+              <option value="Todos">Todos los estados</option>
+              <option value="Completado">Completado</option>
+              <option value="En proceso">En proceso</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
           </div>
 
           <button
