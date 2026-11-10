@@ -1,6 +1,7 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 import { getSaleById } from "~/services/sales.server.ts";
+import { getUser } from "~/services/session.server.ts";
 import { formatCOP, formatDateTime } from "~/utils/formatters.ts";
 import { 
   Printer, 
@@ -15,16 +16,20 @@ import {
   QrCode
 } from "lucide-react";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const id = Number(params.id);
   if (isNaN(id)) {
     throw new Response("ID de factura inválido", { status: 400 });
   }
 
   try {
+    const user = await getUser(request);
     const sale = await getSaleById(id);
     if (!sale) {
       throw new Response("Factura o comprobante no encontrado", { status: 404 });
+    }
+    if (!user || (user.role !== "Administrador" && user.clientId !== sale.clientId)) {
+      throw new Response("No tienes permiso para consultar esta factura.", { status: 403 });
     }
 
     return json({ sale });

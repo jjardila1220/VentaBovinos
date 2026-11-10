@@ -1,4 +1,4 @@
-import { json, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-run/node";
+import { json, redirect, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSearchParams, Link, Form } from "@remix-run/react";
 import { getBovines, getAllBreeds, reserveBovineAtomic } from "~/services/bovines.server.ts";
 import { getUser } from "~/services/session.server.ts";
@@ -64,20 +64,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   } catch (error) {
     console.error("Catálogo loader notice:", error);
-    // Fallback de catálogo si postgres aún no corre en local
-    const fallbackBreeds = [
-      { id: 1, name: "Holstein" },
-      { id: 2, name: "Jersey" },
-      { id: 3, name: "Brahman" },
-      { id: 4, name: "Angus" },
-      { id: 5, name: "Simmental" },
-    ];
     return json({
       bovines: [],
       total: 0,
       page: 1,
       totalPages: 1,
-      breeds: fallbackBreeds,
+      breeds: [],
       filters: {
         category,
         breedId: breedIdStr || "",
@@ -104,7 +96,8 @@ export async function action({ request }: ActionFunctionArgs) {
     const bovineId = Number(formData.get("bovineId"));
     const user = await getUser(request);
     if (!user) {
-      return json({ error: "Debes iniciar sesión para agregar al carrito." }, { status: 401 });
+      const url = new URL(request.url);
+      throw redirect(`/login?redirectTo=${encodeURIComponent(url.pathname + url.search)}`);
     }
     const res = await reserveBovineAtomic(bovineId, user.id);
     if (!res.success) {
