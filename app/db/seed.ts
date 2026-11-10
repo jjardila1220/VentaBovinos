@@ -64,12 +64,11 @@ export async function seedDatabase() {
   const existingClients = await db.select().from(clients);
   const clientMap = new Map(existingClients.map((c) => [c.email, c.id]));
 
-  // 3. Usuarios (uno por rol: Administrador, Vendedor, Cliente)
+  // 3. Usuarios (Administrador y Cliente)
   console.log("Insertando usuarios con contraseñas hasheadas...");
   const { hashPassword: hashPw } = await import("../services/auth.server.ts");
 
   const adminPassHash = await hashPw("admin123");
-  const vendorPassHash = await hashPw("vendedor123");
   const clientPassHash = await hashPw("cliente123");
 
   const userList = [
@@ -78,13 +77,6 @@ export async function seedDatabase() {
       email: "admin@ganadocarnes.com",
       passwordHash: adminPassHash,
       role: "Administrador" as const,
-      active: true,
-    },
-    {
-      name: "Laura Vargas (Asesora Comercial)",
-      email: "vendedor@ganadocarnes.com",
-      passwordHash: vendorPassHash,
-      role: "Vendedor" as const,
       active: true,
     },
     {

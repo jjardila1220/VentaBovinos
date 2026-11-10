@@ -1,6 +1,6 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSearchParams, Link, Form } from "@remix-run/react";
-import { requireStaff } from "~/services/auth.server.ts";
+import { requireAdmin } from "~/services/auth.server.ts";
 import { getSalesHistory } from "~/services/sales.server.ts";
 import { formatCOP, formatDateTime } from "~/utils/formatters.ts";
 import { 
@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await requireStaff(request);
+  await requireAdmin(request);
   const url = new URL(request.url);
 
   const startDate = url.searchParams.get("startDate") || "";

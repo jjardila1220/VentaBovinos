@@ -23,7 +23,6 @@ export const saleStatusEnum = pgEnum("sale_status", [
 
 export const userRoleEnum = pgEnum("user_role", [
   "Cliente",
-  "Vendedor",
   "Administrador"
 ]);
 

@@ -46,7 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (intent === "updateRole") {
     const newRole = formData.get("role")?.toString() as any;
-    if (["Cliente", "Vendedor", "Administrador"].includes(newRole)) {
+    if (["Cliente", "Administrador"].includes(newRole)) {
       await db.update(users).set({ role: newRole }).where(eq(users.id, targetUserId));
       return json({ success: true });
     }
@@ -87,7 +87,7 @@ export default function Usuarios() {
             <span>Gestión de Usuarios</span>
           </h1>
           <p className="text-stone-500 text-xs mt-1">
-            Administra los roles del sistema (Cliente, Vendedor, Administrador) y el estado de activación de cuentas.
+            Administra los roles del sistema (Cliente, Administrador) y el estado de activación de cuentas.
           </p>
         </div>
 
@@ -133,7 +133,6 @@ export default function Usuarios() {
                         className="bg-stone-50 border border-stone-200 rounded-xl px-2.5 py-1 text-xs text-stone-800 font-bold focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
                       >
                         <option value="Cliente">Cliente</option>
-                        <option value="Vendedor">Vendedor</option>
                         <option value="Administrador">Administrador</option>
                       </select>
                     </Form>

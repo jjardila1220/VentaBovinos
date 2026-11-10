@@ -69,11 +69,3 @@ export async function requireAdmin(request: Request) {
   }
   return user;
 }
-
-export async function requireStaff(request: Request) {
-  const user = await getUser(request);
-  if (!user || (user.role !== "Administrador" && user.role !== "Vendedor")) {
-    throw redirect("/?error=Acceso+restringido.+Se+requieren+permisos+de+personal.");
-  }
-  return user;
-}

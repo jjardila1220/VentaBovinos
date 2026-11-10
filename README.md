@@ -24,7 +24,6 @@ Puede iniciar sesión normalmente desde la pantalla de **Inicio de sesión**. La
 | Rol | Correo Electrónico | Contraseña | Permisos y Alcance |
 | :--- | :--- | :--- | :--- |
 | **Administrador** | `admin@ganadocarnes.com` | `admin123` | **Acceso total:** Catálogo, compras, registro/edición/eliminación de bovinos (CRUD), inventario completo, reportes consolidados con exportación a CSV y gestión de usuarios. |
-| **Vendedor** | `vendedor@ganadocarnes.com` | `vendedor123` | **Operativo:** Catálogo, carrito, checkout, consulta de historial de ventas y vista de inventario en modo lectura. |
 | **Cliente** | `cliente@ganadocarnes.com` | `cliente123` | **Comercial:** Catálogo, filtros, detalle técnico, carrito de compras, checkout con factura y visualización de sus comprobantes. |
 
 ---
@@ -77,12 +76,12 @@ Puede iniciar sesión normalmente desde la pantalla de **Inicio de sesión**. La
    - Mensajes de error genéricos (*"Credenciales inválidas"*).
    - Autenticación mediante sesión server-side y control de acceso por rol.
 
-9. **Historial de Ventas (Administrador y Vendedor):**
+9. **Historial de Ventas (Solo Administrador):**
    - Filtros por rango de fechas, estado (*Completado*, *En proceso*, *Cancelado*), producto y número de factura.
    - Tabla con fecha, factura, producto, cantidad, total y estado.
    - Clic en cualquier fila abre el comprobante detallado. Paginación.
 
-10. **Inventario (Administrador y Vendedor):**
+10. **Inventario (Solo Administrador):**
     - Tabla con ID, producto, cantidad, estado (*Disponible*, *Reservado*, *Vendido*). Stock actualizado tras cada compra.
     - Pestaña de Movimientos (Kárdex): entradas, salidas y ventas con fecha, tipo, referencia y usuario.
 
@@ -91,7 +90,7 @@ Puede iniciar sesión normalmente desde la pantalla de **Inicio de sesión**. La
     - Gráfico de barras responsivo por categoría/producto en COP, tarjetas con métricas totales y botón *"Exportar a CSV"*.
 
 12. **Gestión de Usuarios (Solo Administrador):**
-    - Tabla de usuarios con rol (*Cliente*, *Vendedor*, *Administrador*), selector para cambiar de rol y botón para activar/desactivar cuentas.
+    - Tabla de usuarios con rol (*Cliente*, *Administrador*), selector para cambiar de rol y botón para activar/desactivar cuentas.
 
 13. **Páginas Adicionales:**
     - **Nosotros:** Misión ganadera, compromiso de sanidad y trazabilidad.

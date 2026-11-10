@@ -22,7 +22,7 @@ interface HeaderProps {
     id: number;
     name: string;
     email: string;
-    role: "Cliente" | "Vendedor" | "Administrador";
+    role: "Cliente" | "Administrador";
   } | null;
   cartCount?: number;
 }
@@ -35,7 +35,7 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isAdmin = user?.role === "Administrador";
-  const isStaff = user?.role === "Administrador" || user?.role === "Vendedor";
+  const isStaff = isAdmin;
 
   const navLinks = [
     { to: "/", label: "Inicio" },

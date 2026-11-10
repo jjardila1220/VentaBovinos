@@ -1,7 +1,7 @@
 import { json, redirect, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useActionData, Form, Link, useSearchParams, useNavigation } from "@remix-run/react";
 import { useState } from "react";
-import { requireStaff, requireAdmin } from "~/services/auth.server.ts";
+import { requireAdmin } from "~/services/auth.server.ts";
 import { getInventoryStock, getMovementsLog } from "~/services/inventory.server.ts";
 import { deleteBovine, getAllBreeds, updateBovine } from "~/services/bovines.server.ts";
 import { formatCOP, formatDateTime } from "~/utils/formatters.ts";
@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await requireStaff(request);
+  const user = await requireAdmin(request);
   const url = new URL(request.url);
 
   const tab = url.searchParams.get("tab") || "stock";
