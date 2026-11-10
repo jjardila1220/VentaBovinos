@@ -9,10 +9,8 @@ import {
   ShieldCheck, 
   LogOut, 
   ChevronDown, 
-  FileText, 
+  FileText,
   Users, 
-  BarChart3, 
-  PlusCircle, 
   Package,
   Layers
 } from "lucide-react";
@@ -35,7 +33,6 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isAdmin = user?.role === "Administrador";
-  const isStaff = isAdmin;
 
   const navLinks = [
     { to: "/", label: "Inicio" },
@@ -47,7 +44,6 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
   const isAdminSection =
     location.pathname.startsWith("/inventario") ||
     location.pathname.startsWith("/ventas") ||
-    location.pathname.startsWith("/reportes") ||
     location.pathname.startsWith("/usuarios") ||
     location.pathname.startsWith("/bovinos") ||
     location.pathname.startsWith("/facturas");
@@ -68,6 +64,13 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
       hint: "Existencias y movimientos del hato",
       icon: Package,
       iconClass: "text-amber-600",
+    },
+    {
+      to: "/ventas",
+      label: "Historial de ventas",
+      hint: "Consultar ventas y facturas registradas",
+      icon: FileText,
+      iconClass: "text-blue-600",
     },
     ...(isAdmin
       ? [
@@ -144,7 +147,7 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
           ))}
 
           {/* Administración dropdown (si es staff o admin) */}
-          {isStaff && (
+          {isAdmin && (
             <div className="relative">
               <button
                 type="button"
@@ -263,7 +266,7 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                     </div>
 
                     <div className="py-1">
-                      {isStaff ? (
+                      {isAdmin ? (
                         <Link
                           to="/ventas"
                           onClick={() => setUserMenuOpen(false)}
@@ -356,7 +359,7 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
               </Link>
             ))}
 
-            {isStaff && (
+            {isAdmin && (
               <>
                 <div className="pt-2 text-[10px] uppercase font-bold text-amber-300 px-3">
                   Administración ({user?.role})

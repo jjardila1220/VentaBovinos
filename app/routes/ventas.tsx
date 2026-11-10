@@ -2,12 +2,12 @@ import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSearchParams, Link, Form } from "@remix-run/react";
 import { requireAdmin } from "~/services/auth.server.ts";
 import { getSalesHistory } from "~/services/sales.server.ts";
+import { getReportClients } from "~/services/reports.server.ts";
 import { formatCOP, formatDateTime } from "~/utils/formatters.ts";
 import { 
   FileText, 
   Search, 
   Filter, 
-  Calendar, 
   ChevronRight, 
   Eye, 
   CheckCircle2, 
@@ -24,18 +24,24 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const endDate = url.searchParams.get("endDate") || "";
   const status = url.searchParams.get("status") || "Todos";
   const invoiceNumber = url.searchParams.get("invoiceNumber") || "";
+  const clientIdParam = url.searchParams.get("clientId") || "";
+  const clientId = clientIdParam ? Number(clientIdParam) : undefined;
   const pageStr = url.searchParams.get("page") || "1";
   const page = parseInt(pageStr, 10) || 1;
 
   try {
-    const result = await getSalesHistory({
+    const [result, clients] = await Promise.all([
+      getSalesHistory({
       startDate: startDate || undefined,
       endDate: endDate || undefined,
       status: status !== "Todos" ? status : undefined,
       invoiceNumber: invoiceNumber.trim() || undefined,
+      clientId,
       page,
       limit: 10,
-    });
+      }),
+      getReportClients(),
+    ]);
 
     return json({
       sales: result.items,
@@ -47,7 +53,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
         endDate,
         status,
         invoiceNumber,
+        clientId: clientIdParam,
       },
+      clients,
     });
   } catch (error) {
     console.error("Sales history loader error:", error);
@@ -61,13 +69,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
         endDate,
         status,
         invoiceNumber,
+        clientId: clientIdParam,
       },
+      clients: [],
     });
   }
 }
 
 export default function VentasHistorial() {
-  const { sales, total, page, totalPages, filters } = useLoaderData<typeof loader>();
+  const { sales, total, page, totalPages, filters, clients } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
 
   const createPaginationUrl = (newPage: number) => {
@@ -108,7 +118,7 @@ export default function VentasHistorial() {
 
       {/* Barra de Filtros */}
       <div className="bg-white p-5 rounded-3xl shadow-sm border border-stone-200">
-        <Form method="get" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs items-end">
+        <Form method="get" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-xs items-end">
           {/* N° Comprobante o Cliente */}
           <div className="space-y-1">
             <label className="font-bold text-stone-700 block">N° Factura o Comprobante</label>
@@ -122,6 +132,23 @@ export default function VentasHistorial() {
                 className="w-full bg-stone-50 border border-stone-200 rounded-xl pl-8 pr-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
               />
             </div>
+          </div>
+
+          {/* Cliente */}
+          <div className="space-y-1">
+            <label className="font-bold text-stone-700 block">Cliente</label>
+            <select
+              name="clientId"
+              defaultValue={filters.clientId}
+              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
+            >
+              <option value="">Todos los clientes</option>
+              {clients.map((client) => (
+                <option key={client.id} value={client.id}>
+                  {client.name} - {client.document}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Fecha Inicio */}
@@ -170,6 +197,19 @@ export default function VentasHistorial() {
               <Filter className="w-3.5 h-3.5" />
               <span>Filtrar</span>
             </button>
+            <a
+              href={`/reportes/pdf?${new URLSearchParams({
+                startDate: filters.startDate,
+                endDate: filters.endDate,
+                clientId: filters.clientId,
+                status: filters.status,
+                invoiceNumber: filters.invoiceNumber,
+              }).toString()}`}
+              className="flex-1 py-2 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs transition-colors shadow-xs flex items-center justify-center gap-1.5"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Generar PDF</span>
+            </a>
             <Link
               to="/ventas"
               className="p-2 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-xl transition-colors"

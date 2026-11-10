@@ -11,6 +11,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const endDate = url.searchParams.get("endDate") || undefined;
   const clientIdParam = url.searchParams.get("clientId") || "";
   const status = url.searchParams.get("status") || "Todos";
+  const invoiceNumber = url.searchParams.get("invoiceNumber") || undefined;
   const parsedClientId = clientIdParam ? Number(clientIdParam) : undefined;
 
   if (clientIdParam) {
@@ -21,7 +22,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const clientId = parsedClientId;
 
   const [{ items: sales, total }, clients] = await Promise.all([
-    getSalesHistory({ startDate, endDate, clientId, status, page: 1, limit: 10000 }),
+    getSalesHistory({ startDate, endDate, clientId, status, invoiceNumber, page: 1, limit: 10000 }),
     getReportClients(),
   ]);
   const selectedClient = clients.find((client) => client.id === clientId);
@@ -51,6 +52,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   document.text(`- Fecha final: ${endDate || "Todas"}`);
   document.text(`- Cliente: ${selectedClient ? `${selectedClient.name} (${selectedClient.document})` : "Todos"}`);
   document.text(`- Estado: ${status}`);
+  document.text(`- Factura: ${invoiceNumber || "Todas"}`);
   document.text(`- Registros encontrados: ${total}`);
   document.moveDown();
 
