@@ -3,7 +3,10 @@ import { useLoaderData, useSearchParams, Link, Form } from "@remix-run/react";
 import { requireAdmin } from "~/services/auth.server.ts";
 import { getSalesHistory } from "~/services/sales.server.ts";
 import { getReportClients } from "~/services/reports.server.ts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
+import { DatePicker } from "~/components/ui/date-picker.tsx";
 import { formatCOP, formatDateTime } from "~/utils/formatters.ts";
+import { useState } from "react";
 import { 
   FileText, 
   Search, 
@@ -79,6 +82,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function VentasHistorial() {
   const { sales, total, page, totalPages, filters, clients } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
+  const [clientId, setClientId] = useState(filters.clientId);
+  const [status, setStatus] = useState(filters.status);
+  const [startDate, setStartDate] = useState(filters.startDate);
+  const [endDate, setEndDate] = useState(filters.endDate);
 
   const createPaginationUrl = (newPage: number) => {
     const params = new URLSearchParams(searchParams);
@@ -137,55 +144,65 @@ export default function VentasHistorial() {
           {/* Cliente */}
           <div className="space-y-1">
             <label className="font-bold text-stone-700 block">Cliente</label>
-            <select
-              name="clientId"
-              defaultValue={filters.clientId}
-              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
+            <input type="hidden" name="clientId" value={clientId === "all" ? "" : clientId} />
+            <Select
+              value={clientId || "all"}
+              onValueChange={(value) => setClientId(value === "all" ? "" : value)}
             >
-              <option value="">Todos los clientes</option>
+              <SelectTrigger>
+                <SelectValue placeholder="Todos los clientes" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los clientes</SelectItem>
               {clients.map((client) => (
-                <option key={client.id} value={client.id}>
+                <SelectItem key={client.id} value={String(client.id)}>
                   {client.name} - {client.document}
-                </option>
+                </SelectItem>
               ))}
-            </select>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Fecha Inicio */}
           <div className="space-y-1">
             <label className="font-bold text-stone-700 block">Desde</label>
-            <input
-              type="date"
+            <DatePicker
               name="startDate"
-              defaultValue={filters.startDate}
-              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
+              value={startDate}
+              onChange={setStartDate}
+              placeholder="Seleccionar fecha"
             />
           </div>
 
           {/* Fecha Fin */}
           <div className="space-y-1">
             <label className="font-bold text-stone-700 block">Hasta</label>
-            <input
-              type="date"
+            <DatePicker
               name="endDate"
-              defaultValue={filters.endDate}
-              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
+              value={endDate}
+              onChange={setEndDate}
+              placeholder="Seleccionar fecha"
             />
           </div>
 
           {/* Estado */}
           <div className="space-y-1">
             <label className="font-bold text-stone-700 block">Estado</label>
-            <select
+            <Select
               name="status"
-              defaultValue={filters.status}
-              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
+              value={status}
+              onValueChange={setStatus}
             >
-              <option value="Todos">Todos los estados</option>
-              <option value="Completado">Completado</option>
-              <option value="En proceso">En proceso</option>
-              <option value="Cancelado">Cancelado</option>
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Todos los estados" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Todos">Todos los estados</SelectItem>
+                <SelectItem value="Completado">Completado</SelectItem>
+                <SelectItem value="En proceso">En proceso</SelectItem>
+                <SelectItem value="Cancelado">Cancelado</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Botones de acción */}
