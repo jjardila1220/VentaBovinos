@@ -6,7 +6,7 @@ import { getReportClients } from "~/services/reports.server.ts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select.tsx";
 import { DatePicker } from "~/components/ui/date-picker.tsx";
 import { formatCOP, formatDateTime } from "~/utils/formatters.ts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   FileText, 
   Search, 
@@ -86,6 +86,15 @@ export default function VentasHistorial() {
   const [status, setStatus] = useState(filters.status);
   const [startDate, setStartDate] = useState(filters.startDate);
   const [endDate, setEndDate] = useState(filters.endDate);
+  const [invoiceNumber, setInvoiceNumber] = useState(filters.invoiceNumber);
+
+  useEffect(() => {
+    setClientId(filters.clientId);
+    setStatus(filters.status);
+    setStartDate(filters.startDate);
+    setEndDate(filters.endDate);
+    setInvoiceNumber(filters.invoiceNumber);
+  }, [filters]);
 
   const createPaginationUrl = (newPage: number) => {
     const params = new URLSearchParams(searchParams);
@@ -134,7 +143,8 @@ export default function VentasHistorial() {
               <input
                 type="text"
                 name="invoiceNumber"
-                defaultValue={filters.invoiceNumber}
+                value={invoiceNumber}
+                onChange={(event) => setInvoiceNumber(event.target.value)}
                 placeholder="FAC-2026-..."
                 className="w-full bg-stone-50 border border-stone-200 rounded-xl pl-8 pr-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B3202A]"
               />
@@ -188,8 +198,8 @@ export default function VentasHistorial() {
           {/* Estado */}
           <div className="space-y-1">
             <label className="font-bold text-stone-700 block">Estado</label>
+            <input type="hidden" name="status" value={status} />
             <Select
-              name="status"
               value={status}
               onValueChange={setStatus}
             >
@@ -216,11 +226,11 @@ export default function VentasHistorial() {
             </button>
             <a
               href={`/reportes/pdf?${new URLSearchParams({
-                startDate: filters.startDate,
-                endDate: filters.endDate,
-                clientId: filters.clientId,
-                status: filters.status,
-                invoiceNumber: filters.invoiceNumber,
+                startDate,
+                endDate,
+                clientId,
+                status,
+                invoiceNumber,
               }).toString()}`}
               className="flex-1 py-2 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs transition-colors shadow-xs flex items-center justify-center gap-1.5"
             >
