@@ -53,47 +53,24 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
     location.pathname.startsWith("/facturas");
 
   const adminMenuItems = [
-    ...(isAdmin
-      ? [
-          {
-            to: "/bovinos/nuevo",
-            label: "Registrar bovino",
-            hint: "Alta con datos básicos y atributos",
-            icon: PlusCircle,
-            iconClass: "text-emerald-600",
-          },
-          {
-            to: "/catalogo",
-            label: "Consultar y filtrar",
-            hint: "Búsqueda por raza, peso y características",
-            icon: Layers,
-            iconClass: "text-stone-500",
-          },
-        ]
-      : []),
     {
       to: "/inventario",
-      label: "Inventario y movimientos",
-      hint: "Consultar, modificar y trazabilidad",
+      label: "Bovinos",
+      hint: isAdmin
+        ? "Consultar, agregar, editar y eliminar ejemplares"
+        : "Consultar ejemplares registrados",
+      icon: Layers,
+      iconClass: "text-emerald-600",
+    },
+    {
+      to: "/inventario?tab=movimientos",
+      label: "Inventario",
+      hint: "Existencias y movimientos del hato",
       icon: Package,
       iconClass: "text-amber-600",
     },
-    {
-      to: "/ventas",
-      label: "Historial de ventas",
-      hint: "Facturas con índice único",
-      icon: FileText,
-      iconClass: "text-blue-600",
-    },
     ...(isAdmin
       ? [
-          {
-            to: "/reportes",
-            label: "Reportes consolidados",
-            hint: "Ventas, inventario y movimientos",
-            icon: BarChart3,
-            iconClass: "text-purple-600",
-          },
           {
             to: "/usuarios",
             label: "Gestión de usuarios",
@@ -196,7 +173,10 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
                       to={item.to}
                       onClick={() => setAdminMenuOpen(false)}
                       className={`block px-3.5 py-2 hover:bg-stone-50 ${
-                        location.pathname === item.to ? "bg-rose-50" : ""
+                        `${location.pathname}${location.search}` === item.to ||
+                        (item.to === "/inventario" && location.pathname === "/inventario" && !location.search)
+                          ? "bg-rose-50"
+                          : ""
                       }`}
                     >
                       <span className="flex items-start gap-2">
