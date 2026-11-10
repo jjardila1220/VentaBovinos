@@ -119,7 +119,7 @@ export default function Checkout() {
           Finalizar Compra de Ganado
         </h1>
         <p className="text-stone-500 text-xs mt-1">
-          Completa los datos del comprador para la expedición de la factura electrónica y la guía sanitaria ICA.
+          Completa los datos del comprador para registrar la compra y generar una referencia de pago simulada.
         </p>
       </div>
 
@@ -289,25 +289,25 @@ export default function Checkout() {
                 {
                   id: "Transferencia Bancaria",
                   title: "Transferencia Bancaria (Bancolombia / Davivienda)",
-                  description: "Consignación directa a la cuenta corriente empresarial de GanadoCarnes. Verificación inmediata.",
+                  description: "Referencia de pago simulada para validar el flujo de compra.",
                   icon: Building2,
                 },
                 {
                   id: "Efectivo en Predio",
                   title: "Efectivo Contra Entrega en Predio",
-                  description: "Pago en efectivo al momento del pesaje y verificación veterinaria en corral.",
+                  description: "Método registrado como pago simulado para validar el flujo.",
                   icon: Banknote,
                 },
                 {
                   id: "Tarjeta de Crédito",
                   title: "Tarjeta de Crédito / Débito (Pasarela Segura)",
-                  description: "Visa, Mastercard, American Express en hasta 12 cuotas fijas.",
+                  description: "Tarjeta simulada; no se conecta con una pasarela real.",
                   icon: CreditCard,
                 },
                 {
                   id: "PSE",
                   title: "PSE - Débito Bancario en Línea",
-                  description: "Débito seguro desde cualquier cuenta corriente o de ahorros en Colombia.",
+                  description: "PSE simulado; no se realiza un débito bancario real.",
                   icon: ShieldCheck,
                 },
               ].map((m) => {

@@ -63,12 +63,12 @@ Puede iniciar sesión normalmente desde la pantalla de **Inicio de sesión**. La
 
 6. **Checkout (3 Pasos):**
    - **Paso 1:** Datos del comprador (nombre, documento/NIT, teléfono, correo, dirección del predio, municipio).
-   - **Paso 2:** Método de pago (Transferencia Bancaria, Efectivo en Predio, Tarjeta de Crédito, PSE).
+   - **Paso 2:** Método de pago simulado (Transferencia Bancaria, Efectivo en Predio, Tarjeta de Crédito, PSE).
    - **Paso 3:** Confirmación con resumen de cabezas, datos y total.
 
 7. **Comprobante o Factura:**
    - Formato oficial con índice consecutivo único: `FAC-AAAA-000001` (ej. `FAC-2026-000006`).
-   - Fecha y hora exacta, datos del comprador, tabla de bovinos con ID, precio, subtotal, total y estado *"Completado"*.
+   - Fecha y hora exacta, datos del comprador, referencia de pago simulada, tabla de bovinos con ID, precio, subtotal, total y estado *"Completado"*.
    - Botones *"Imprimir"* (con estilos limpios para impresión en papel) y *"Descargar PDF"*.
 
 8. **Inicio de Sesión y Registro:**
@@ -104,6 +104,7 @@ Puede iniciar sesión normalmente desde la pantalla de **Inicio de sesión**. La
 2. **Reserva en Carrito:** Al agregar un bovino al carrito, se marca automáticamente como `"Reservado"`. Si otro usuario intenta agregarlo, el sistema le impide la acción y le notifica: *"Este bovino ya no está disponible (ha sido reservado por otro usuario)"*.
 3. **Liberación Automática:** Al remover el bovino del carrito, este se libera inmediatamente y vuelve al estado `"Disponible"`.
 4. **Cierre de Venta:** Al completar la compra en checkout, el bovino pasa de forma irreversible a `"Vendido"`, el inventario se descuenta (cantidad 0), se registra el movimiento en el kárdex y se emite la factura única `FAC-2026-XXXXXX`.
+5. **Pago provisional:** El sistema genera y almacena una referencia `MOCK-*` para validar el flujo; no conecta todavía con una pasarela de pago real ni gestiona despacho o entrega.
 5. **Validación Numérica:** Ningún valor de precio, peso o edad puede ser menor o igual a cero.
 6. **Protección de Rutas:** Si un usuario con rol Cliente intenta acceder a pantallas administrativas, es redirigido a Inicio con una notificación toast de acceso restringido.
 

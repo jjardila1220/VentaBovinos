@@ -30,6 +30,12 @@ export async function generateInvoiceNumber(tx: any): Promise<string> {
   return `FAC-${year}-${String(nextSeq).padStart(6, "0")}`;
 }
 
+export function generateMockPaymentReference(): string {
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `MOCK-${timestamp}-${suffix}`;
+}
+
 export async function completeCheckoutTransaction(params: {
   userId: number;
   buyer: {
@@ -100,6 +106,7 @@ export async function completeCheckoutTransaction(params: {
 
     // 4. Generar número de factura único formato FAC-AAAA-000001
     const invoiceNumber = await generateInvoiceNumber(tx);
+    const paymentReference = generateMockPaymentReference();
 
     // 5. Crear la venta
     const [insertedSale] = await tx
@@ -108,6 +115,7 @@ export async function completeCheckoutTransaction(params: {
         clientId: clientRecord.id,
         invoiceNumber,
         paymentMethod,
+        paymentReference,
         total: String(totalAmount),
         status: "Completado",
       })
@@ -149,6 +157,7 @@ export async function completeCheckoutTransaction(params: {
     return {
       sale: insertedSale,
       invoiceNumber,
+      paymentReference,
       client: clientRecord,
       bovines: cartBovines,
     };
@@ -205,6 +214,7 @@ export async function getSalesHistory(filters: {
       total: sales.total,
       status: sales.status,
       paymentMethod: sales.paymentMethod,
+      paymentReference: sales.paymentReference,
       clientName: clients.name,
       clientDocument: clients.document,
       clientPhone: clients.phone,
@@ -261,6 +271,7 @@ export async function getSaleById(id: number) {
       total: sales.total,
       status: sales.status,
       paymentMethod: sales.paymentMethod,
+      paymentReference: sales.paymentReference,
       clientId: clients.id,
       clientName: clients.name,
       clientDocument: clients.document,
@@ -307,6 +318,7 @@ export async function getSaleByInvoiceNumber(invoiceNumber: string) {
       total: sales.total,
       status: sales.status,
       paymentMethod: sales.paymentMethod,
+      paymentReference: sales.paymentReference,
       clientId: clients.id,
       clientName: clients.name,
       clientDocument: clients.document,

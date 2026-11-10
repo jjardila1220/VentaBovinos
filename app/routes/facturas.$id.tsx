@@ -141,9 +141,9 @@ export default function FacturaDetalle() {
             </h3>
             <div className="space-y-1 text-stone-700">
               <p><strong>Método de Pago:</strong> {sale.paymentMethod}</p>
-              <p><strong>Guía ICA (GSMI):</strong> Autorizada y Tramitada</p>
-              <p><strong>Vigencia Sanitaria:</strong> 5 días calendario</p>
-              <p><strong>Pesaje Oficial:</strong> Realizado en Báscula Camionera</p>
+              <p><strong>Referencia de Pago:</strong> <span className="font-mono">{sale.paymentReference}</span> (simulada)</p>
+              <p><strong>Guía ICA (GSMI):</strong> Pendiente de trámite</p>
+              <p><strong>Despacho y entrega:</strong> Pendientes de coordinación</p>
             </div>
           </div>
         </div>

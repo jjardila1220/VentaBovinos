@@ -431,7 +431,8 @@ export async function seedDatabase() {
         .values({
           clientId: inv.clientId,
           invoiceNumber: inv.invoiceNumber,
-          paymentMethod: inv.paymentMethod,
+            paymentReference: `SEED-${inv.invoiceNumber}`,
+            paymentMethod: inv.paymentMethod,
           total: inv.total,
           status: inv.status,
           date: inv.date,

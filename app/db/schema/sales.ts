@@ -15,6 +15,7 @@ export const sales = pgTable(
     total: numeric("total", { precision: 14, scale: 2 }).notNull(),
     status: saleStatusEnum("status").default("Completado").notNull(),
     paymentMethod: varchar("payment_method", { length: 100 }).notNull(),
+    paymentReference: varchar("payment_reference", { length: 80 }).notNull().unique(),
     invoiceNumber: varchar("invoice_number", { length: 50 }).notNull().unique(),
   },
   (table) => [
