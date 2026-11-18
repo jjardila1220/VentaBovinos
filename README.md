@@ -160,3 +160,19 @@ Abre tu navegador en `http://localhost:5173`.
 - `bun run push`: Aplica cambios directamente del esquema a la base sin crear archivo de migración.
 - `bun run studio`: Abre la interfaz gráfica web de Drizzle Studio para explorar las tablas.
 - `bun test`: Ejecuta la suite de pruebas unitarias con Bun test.
+
+---
+
+## 📊 Comparativa de ventas: bovinos vs. semillas (integración con Semillas del Valle)
+
+Ruta **`/reportes/comparativa`** (solo Administrador; menú *Administración → Comparativa de ventas*). Es la única vista que consume la API de **Semillas del Valle** (Django + JWT); el backend de este proyecto se alimenta de **dos fuentes**: su PostgreSQL (bovinos) y esa API (semillas).
+
+**Qué muestra:** conclusión automática, 4 indicadores (ventas de cada lado, total combinado y peso de las semillas), gráfico de barras agrupadas / participación (%), tabla de detalle por periodo, composición por categoría, semillas más vendidas y reservas. Periodos: 8 semanas, 6 meses o 3 años (`?periodo=semana|mes|anio`). Incluye botón *Imprimir*.
+
+**Configuración** (variables de entorno del servidor, ver `.env.example`): `SEMILLAS_API_URL`, `SEMILLAS_API_EMAIL`, `SEMILLAS_API_PASSWORD` (cuenta administradora de Semillas; use una dedicada). Opcionales: `SEMILLAS_API_TIMEOUT_MS`, `SEMILLAS_CACHE_TTL_SECONDS`, `SEMILLAS_API_ALLOW_HTTP`. En producción `remix-serve` no lee `.env`: exporte las variables.
+
+**Cómo se calcula:** los intervalos los define Semillas y las ventas de bovinos (facturas «Completado», solo líneas de ejemplares) se agrupan en esos mismos intervalos con fecha de Bogotá (UTC-5).
+
+**Seguridad:** credenciales y tokens solo en servidor; URL fija desde configuración (https obligatorio en producción); sin seguimiento de redirecciones; timeout y límite de tamaño; validación estricta de la respuesta; `periodo` por lista blanca; errores sin datos sensibles; `Cache-Control: no-store`. Además: cabeceras de seguridad globales, corrección de *open redirect* en el login y `SESSION_SECRET` obligatorio en producción.
+
+**Código:** `app/services/semillas.server.ts` (cliente), `comparativa.ts` (lógica pura), `comparativa.server.ts` (BD + orquestación), `app/routes/reportes.comparativa.tsx` y `app/components/comparativa/`. Pruebas: `bun test` (`app/tests/`). Tras actualizar, ejecute `bun install` para registrar `@types/bun`.

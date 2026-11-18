@@ -12,7 +12,8 @@ import {
   FileText,
   Users, 
   Package,
-  Layers
+  Layers,
+  ChartColumn
 } from "lucide-react";
 
 interface HeaderProps {
@@ -45,6 +46,7 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
     location.pathname.startsWith("/inventario") ||
     location.pathname.startsWith("/ventas") ||
     location.pathname.startsWith("/usuarios") ||
+    location.pathname.startsWith("/reportes") ||
     location.pathname.startsWith("/bovinos") ||
     location.pathname.startsWith("/facturas");
 
@@ -72,6 +74,13 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
       icon: FileText,
       iconClass: "text-blue-600",
     },
+    {
+      to: "/reportes/comparativa",
+      label: "Comparativa de ventas",
+      hint: "Bovinos frente a semillas (Semillas del Valle)",
+      icon: ChartColumn,
+      iconClass: "text-emerald-700",
+    },
     ...(isAdmin
       ? [
           {
@@ -86,7 +95,7 @@ export function Header({ user, cartCount = 0 }: HeaderProps) {
   ];
 
   return (
-    <header className="bg-[#B3202A] text-white shadow-md sticky top-0 z-40">
+    <header className="bg-[#B3202A] text-white shadow-md sticky top-0 z-40 print:hidden">
       {/* Micro topbar */}
       <div className="bg-[#8B1820] text-rose-200 text-[11px] py-1 px-4 border-b border-red-900/60">
         <div className="max-w-7xl mx-auto flex items-center justify-between">

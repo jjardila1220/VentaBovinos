@@ -7,6 +7,19 @@ import { renderToPipeableStream } from "react-dom/server";
 
 const ABORT_DELAY = 5_000;
 
+// Cabeceras que no alteran el funcionamiento de la app. (Una CSP con `script-src` requeriría
+// nonces en los scripts de Remix; queda como mejora futura.)
+function applySecurityHeaders(headers: Headers) {
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("X-Frame-Options", "DENY");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  headers.set("Content-Security-Policy", "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'");
+  if (process.env.NODE_ENV === "production") {
+    headers.set("Strict-Transport-Security", "max-age=31536000");
+  }
+}
+
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -14,6 +27,7 @@ export default function handleRequest(
   remixContext: EntryContext,
   loadContext: AppLoadContext
 ) {
+  applySecurityHeaders(responseHeaders);
   return isbot(request.headers.get("user-agent"))
     ? handleBotRequest(
         request,

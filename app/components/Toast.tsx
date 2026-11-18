@@ -23,7 +23,7 @@ export function Toast({ message, type = "success", duration = 4000 }: ToastProps
   if (!visible || !message) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex items-start gap-3 p-3.5 rounded-xl shadow-xl border text-xs font-medium animate-in slide-in-from-bottom duration-200 bg-stone-900 text-white border-stone-800 max-w-sm">
+    <div className="fixed bottom-5 right-5 z-50 print:hidden flex items-start gap-3 p-3.5 rounded-xl shadow-xl border text-xs font-medium animate-in slide-in-from-bottom duration-200 bg-stone-900 text-white border-stone-800 max-w-sm">
       {type === "success" && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />}
       {type === "error" && <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />}
       {type === "info" && <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />}

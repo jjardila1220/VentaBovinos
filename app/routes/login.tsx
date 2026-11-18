@@ -2,13 +2,14 @@ import { json, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-r
 import { useActionData, useSearchParams, Form, Link, useNavigation } from "@remix-run/react";
 import { authenticate, createUserSession } from "~/services/auth.server.ts";
 import { getUser } from "~/services/session.server.ts";
+import { safeRedirect } from "~/utils/safe-redirect.ts";
 import { Lock, Mail, AlertCircle } from "lucide-react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getUser(request);
   if (user) {
     const url = new URL(request.url);
-    const redirectTo = url.searchParams.get("redirectTo") || "/";
+    const redirectTo = safeRedirect(url.searchParams.get("redirectTo"));
     throw createUserSession(user.id, redirectTo, request);
   }
   return json({});
@@ -18,7 +19,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const email = formData.get("email")?.toString() || "";
   const password = formData.get("password")?.toString() || "";
-  const redirectTo = formData.get("redirectTo")?.toString() || "/";
+  const redirectTo = safeRedirect(formData.get("redirectTo")?.toString());
 
   if (!email || !password) {
     return json({ error: "Credenciales inválidas" }, { status: 400 });
@@ -39,7 +40,7 @@ export default function Login() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
-  const redirectTo = searchParams.get("redirectTo") || "/";
+  const redirectTo = safeRedirect(searchParams.get("redirectTo"));
 
   return (
     <div className="max-w-md mx-auto px-4 py-12 space-y-8">

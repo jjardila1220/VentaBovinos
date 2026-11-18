@@ -3,7 +3,7 @@ import { Truck, Award, Headphones, MapPin, Phone, Mail, ShieldCheck } from "luci
 
 export function Footer() {
   return (
-    <footer className="mt-auto">
+    <footer className="mt-auto print:hidden">
       {/* Tres beneficios en fondo rosa claro (#F9E3E3) */}
       <section className="bg-[#F9E3E3] py-12 px-4 sm:px-6 border-t border-rose-200">
         <div className="max-w-7xl mx-auto">

@@ -39,6 +39,7 @@
     "vite": "^8.3.0"
   },
   "devDependencies": {
+    "@types/bun": "^1.4.4",
     "@types/node": "^22.14.0",
     "@types/pdfkit": "^0.17.7",
     "@types/react": "^19.3.0",

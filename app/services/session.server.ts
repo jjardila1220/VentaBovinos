@@ -3,7 +3,13 @@ import { db } from "~/db/index.ts";
 import { users } from "~/db/schema/users.ts";
 import { eq } from "drizzle-orm";
 
-const sessionSecret = process.env.SESSION_SECRET || "un_secreto_muy_seguro_para_firmar_cookies_de_remix_2026";
+const DEV_SESSION_SECRET = "solo-para-desarrollo-local-no-usar-en-produccion";
+const sessionSecret = process.env.SESSION_SECRET || DEV_SESSION_SECRET;
+
+// Un secreto público o ausente permitiría falsificar cookies de sesión.
+if (process.env.NODE_ENV === "production" && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32)) {
+  throw new Error("SESSION_SECRET es obligatorio en producción y debe tener al menos 32 caracteres.");
+}
 
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
